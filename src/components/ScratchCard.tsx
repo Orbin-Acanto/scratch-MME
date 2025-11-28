@@ -1,0 +1,469 @@
+import React, { useEffect, useRef, useState } from "react";
+import {
+  PRIZE_CARDS,
+  STORAGE_PRIZE_ID_KEY,
+  STORAGE_SCRATCH_DONE_KEY,
+  type PrizeCard,
+} from "../data/prizeCards";
+import { triggerHolidayConfetti } from "../utils/confetti";
+
+const SCRATCH_RADIUS = 24;
+const COMPLETE_THRESHOLD = 0.55;
+const GOLD_COVER_SRC = "/prize/scratch-card-after-effets-label-gold.png";
+
+const ENABLE_PERSISTENCE = true;
+
+type ContactInfo = {
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+const ScratchCard: React.FC = () => {
+  const [card, setCard] = useState<PrizeCard | null>(null);
+  const [isScratched, setIsScratched] = useState(false);
+  const [cardLoaded, setCardLoaded] = useState(false);
+  const [contact, setContact] = useState<ContactInfo>({
+    email: null,
+    firstName: null,
+    lastName: null,
+  });
+
+  const [showTerms, setShowTerms] = useState(false);
+  const goldImageRef = useRef<HTMLImageElement | null>(null);
+  const [goldReady, setGoldReady] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const isDrawingRef = useRef(false);
+  const lastCheckRef = useRef(0);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = GOLD_COVER_SRC;
+    img.onload = () => {
+      goldImageRef.current = img;
+      setGoldReady(true);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+
+    const email = params.get("email");
+    const firstName = params.get("first_name");
+    const lastName = params.get("last_name");
+
+    setContact({ email, firstName, lastName });
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (!ENABLE_PERSISTENCE) {
+      const random =
+        PRIZE_CARDS[Math.floor(Math.random() * PRIZE_CARDS.length)];
+      setCard(random);
+      setIsScratched(false);
+      return;
+    }
+
+    const storedId = window.localStorage.getItem(STORAGE_PRIZE_ID_KEY);
+    if (storedId) {
+      const found = PRIZE_CARDS.find((p) => p.id === storedId);
+      if (found) {
+        setCard(found);
+      } else {
+        const random =
+          PRIZE_CARDS[Math.floor(Math.random() * PRIZE_CARDS.length)];
+        setCard(random);
+        window.localStorage.setItem(STORAGE_PRIZE_ID_KEY, random.id);
+      }
+    } else {
+      const random =
+        PRIZE_CARDS[Math.floor(Math.random() * PRIZE_CARDS.length)];
+      setCard(random);
+      window.localStorage.setItem(STORAGE_PRIZE_ID_KEY, random.id);
+    }
+
+    const done =
+      window.localStorage.getItem(STORAGE_SCRATCH_DONE_KEY) === "true";
+    setIsScratched(done);
+  }, []);
+
+  useEffect(() => {
+    if (isScratched || !cardLoaded || !goldReady) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    const resize = () => {
+      const rect = parent.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+
+      const img = goldImageRef.current;
+      if (!img) return;
+
+      ctx.globalCompositeOperation = "source-over";
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      ctxRef.current = ctx;
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [isScratched, cardLoaded, goldReady]);
+
+  const scratchAt = (clientX: number, clientY: number) => {
+    const canvas = canvasRef.current;
+    const ctx = ctxRef.current;
+    if (!canvas || !ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * canvas.width;
+    const y = ((clientY - rect.top) / rect.height) * canvas.height;
+
+    const dpr = window.devicePixelRatio || 1;
+    const radius = SCRATCH_RADIUS * dpr;
+
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  const sendRedemption = (promo?: string) => {
+    if (!promo) return;
+
+    const payload = {
+      email: contact.email,
+      first_name: contact.firstName,
+      last_name: contact.lastName,
+      promo,
+    };
+
+    fetch(
+      "https://primary-production-f807.up.railway.app/webhook/04c337fd-96b7-48c8-ae7d-75fe7e2e45442",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    ).catch((err) => {
+      console.error("Failed to send promo redemption", err);
+    });
+  };
+
+  const maybeCheckCompletion = (force = false) => {
+    const now = performance.now();
+    if (!force && now - lastCheckRef.current < 300) return;
+    lastCheckRef.current = now;
+
+    const canvas = canvasRef.current;
+    const ctx = ctxRef.current;
+    if (!canvas || !ctx) return;
+
+    const { width, height } = canvas;
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const pixels = imageData.data;
+
+    let transparentCount = 0;
+    const total = pixels.length / 4;
+
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] === 0) transparentCount++;
+    }
+
+    const ratio = transparentCount / total;
+
+    if (ratio > COMPLETE_THRESHOLD) {
+      setIsScratched(true);
+
+      if (ENABLE_PERSISTENCE && typeof window !== "undefined") {
+        window.localStorage.setItem(STORAGE_SCRATCH_DONE_KEY, "true");
+      }
+
+      sendRedemption(card?.promo);
+
+      triggerHolidayConfetti();
+    }
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isScratched) return;
+    e.preventDefault();
+    isDrawingRef.current = true;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    scratchAt(e.clientX, e.clientY);
+    maybeCheckCompletion();
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawingRef.current || isScratched) return;
+    e.preventDefault();
+    scratchAt(e.clientX, e.clientY);
+    maybeCheckCompletion();
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawingRef.current) return;
+    e.preventDefault();
+    isDrawingRef.current = false;
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    maybeCheckCompletion(true);
+  };
+
+  const showCanvas = !isScratched;
+
+  return (
+    <>
+      <div className="relative z-20 animate-fade-in-up flex justify-center px-4">
+        <div className="relative w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto 4xl:max-w-3xl">
+          {card && (
+            <img
+              src={card.image}
+              alt={card.alt}
+              className="w-full h-auto block"
+              onLoad={() => setCardLoaded(true)}
+            />
+          )}
+
+          <div
+            className="absolute"
+            style={{
+              left: "50%",
+              top: "68%",
+              transform: "translate(-50%, -50%)",
+              width: "45%",
+              height: "32%",
+              cursor: showCanvas
+                ? 'url("/coin.png") 16 16, pointer'
+                : "default",
+            }}
+          >
+            {showCanvas && (
+              <canvas
+                ref={canvasRef}
+                className="block w-full h-full touch-none rounded-md"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerLeave={handlePointerUp}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={() => setShowTerms(true)}
+          className="text-[11px] sm:text-xs text-whitesmoke/80 underline underline-offset-2 hover:text-whitesmoke transition-colors"
+        >
+          Terms &amp; Conditions apply
+        </button>
+      </div>
+
+      {showTerms && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/10 backdrop-blur-sm px-4 mt-8 animate-fade-in overflow-y-auto py-8">
+          <div className="relative w-full max-w-2xl bg-white shadow-2xl p-8 border border-neutral-200/40 animate-scale-in my-8">
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setShowTerms(false)}
+              className="absolute right-4 top-4 p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition-all cursor-pointer z-10"
+              aria-label="Close terms and conditions"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-center text-xl font-semibold tracking-wide text-neutral-800 mb-1">
+              Contest Terms & Conditions
+            </h2>
+
+            <div className="mx-auto mb-6 h-1 w-16 rounded-full bg-primary" />
+
+            <div className="space-y-5 text-sm text-neutral-700 leading-relaxed text-left max-h-[60vh] overflow-y-auto pr-2">
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  1. Eligibility
+                </h3>
+                <p>
+                  This promotion is open to individuals 18 years or older.
+                  Employees of 48 Wall Street Events Inc, its affiliates,
+                  partners, and their immediate family members are not eligible
+                  to participate. The contest is valid only in the state of New
+                  York.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  2. How to Enter
+                </h3>
+                <p>
+                  Participants must access the contest webpage through the link
+                  provided in the email marketing campaign. Each participant is
+                  permitted to play the virtual scratch-off one (1) time only.
+                  Multiple entries or attempts to bypass the system may result
+                  in disqualification.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  3. Contest Period
+                </h3>
+                <p>
+                  The contest is valid from{" "}
+                  <span className="font-medium">
+                    November 17, 2025 through November 21, 2025
+                  </span>
+                  . Entries submitted outside the contest period will not be
+                  honored.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  4. Prizes
+                </h3>
+                <p className="mb-3">
+                  Each virtual scratch-off reveals one (1) of four prizes,
+                  awarded at random:
+                </p>
+                <ol className="list-decimal list-inside space-y-1 ml-4 mb-3">
+                  <li>Hot Cocoa Cart</li>
+                  <li>Free Uplighting</li>
+                  <li>
+                    "Holy Cannoli Experience" (live cannoli maker at event)
+                  </li>
+                  <li>10% Off an Event Booking</li>
+                </ol>
+                <p className="mb-2 font-medium">Prizes are:</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>
+                    Valid only for new bookings at 48 Wall St, New York, NY
+                    10005
+                  </li>
+                  <li>
+                    Redeemable for events taking place January 2026 through
+                    March 2026
+                  </li>
+                  <li>Not transferable and not redeemable for cash</li>
+                  <li>
+                    Subject to date availability and standard venue booking
+                    policies
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  5. Winner Verification & Redemption
+                </h3>
+                <p>
+                  To redeem a prize, winners must mention the promo code when
+                  booking their event at 48 Wall Street. The venue may request
+                  verification of identity or eligibility before applying the
+                  prize to a booking.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  6. Limitations
+                </h3>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>One (1) prize per person.</li>
+                  <li>
+                    Prizes cannot be combined with any other discounts,
+                    promotions, or offers unless explicitly stated.
+                  </li>
+                  <li>
+                    The venue reserves the right to refuse prize redemption for
+                    any booking that does not meet its standard requirements.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  7. Liability
+                </h3>
+                <p>
+                  48 Wall Street Events Inc is not responsible for technical
+                  issues, lost entries, or interruptions that prevent
+                  participation. By entering, participants agree to release the
+                  venue from any claims related to the contest or prize use.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  8. Privacy
+                </h3>
+                <p>
+                  Any personal information collected through the contest will be
+                  used solely for administration of the promotion and will not
+                  be sold or shared.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  9. Right to Modify or Cancel
+                </h3>
+                <p>
+                  48 Wall Street Events Inc reserves the right to amend,
+                  suspend, or cancel the promotion if circumstances outside its
+                  control arise.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-neutral-900 mb-2">
+                  10. Acceptance of Terms
+                </h3>
+                <p>
+                  Participation in the contest constitutes full acceptance of
+                  these Terms & Conditions.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-6 pt-4 border-t border-neutral-200">
+              <p className="text-xs text-neutral-500 text-center">
+                By participating in this contest and redeeming any prize, you
+                acknowledge that you have read, understood, and agree to be
+                bound by these Terms & Conditions.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default ScratchCard;
