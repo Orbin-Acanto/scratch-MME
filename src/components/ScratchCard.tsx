@@ -12,7 +12,7 @@ const SCRATCH_RADIUS = 24;
 const COMPLETE_THRESHOLD = 0.55;
 const GOLD_COVER_SRC = "/prize/scratch-card-after-effets-label-gold.png";
 
-const ENABLE_PERSISTENCE = false;
+const ENABLE_PERSISTENCE = true;
 
 type ContactInfo = {
   email: string | null;
