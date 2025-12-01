@@ -6,12 +6,13 @@ import {
   type PrizeCard,
 } from "../data/prizeCards";
 import { triggerHolidayConfetti } from "../utils/confetti";
+import { motion } from "framer-motion";
 
 const SCRATCH_RADIUS = 24;
 const COMPLETE_THRESHOLD = 0.55;
 const GOLD_COVER_SRC = "/prize/scratch-card-after-effets-label-gold.png";
 
-const ENABLE_PERSISTENCE = true;
+const ENABLE_PERSISTENCE = false;
 
 type ContactInfo = {
   email: string | null;
@@ -273,14 +274,63 @@ const ScratchCard: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-4 text-center">
-        <button
-          type="button"
-          onClick={() => setShowTerms(true)}
-          className="text-[11px] sm:text-xs text-whitesmoke/80 underline underline-offset-2 hover:text-whitesmoke transition-colors"
-        >
-          Terms &amp; Conditions apply
-        </button>
+      <div
+        className={`mt-6 px-4 transition-all duration-500 ease-out ${
+          isScratched
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
+      >
+        <div className="max-w-md sm:max-w-lg md:max-w-xl mx-auto bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-lg">
+          <p className="text-sm sm:text-base text-whitesmoke/90 text-center mb-4">
+            Enjoy a $2,500 credit toward your next event or celebration. This
+            amount will be deducted from any package valued at $10,000 or more,
+            including catering services, event rentals, entertainment, venue
+            services, AV, staging, and lighting.
+          </p>
+          <div className="bg-white/5 rounded-md p-4 border border-white/10 mb-4">
+            <p className="text-xs sm:text-sm text-whitesmoke/80 text-center">
+              This offer is valid for events taking place between January 1,
+              2026 and April 1, 2026.
+            </p>
+          </div>
+          <p className="text-base sm:text-lg font-semibold text-primary text-center">
+            Let the celebration begin!
+          </p>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setShowTerms(true)}
+              className="text-[11px] sm:text-xs text-whitesmoke/80 underline underline-offset-2 hover:text-whitesmoke transition-colors"
+            >
+              Terms &amp; Conditions apply
+            </button>
+          </div>
+          <motion.a
+            href="https://www.48wallnyc.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative mt-8 inline-flex items-center justify-center gap-2 border border-primary/30 bg-primary/5 px-8 py-3 text-sm font-medium text-primary backdrop-blur-sm transition-all duration-300 hover:border-primary hover:bg-primary/10 sm:px-10 sm:py-4 sm:text-base"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Visit the MME worldwide Website
+            <svg
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 sm:h-5 sm:w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+          </motion.a>
+        </div>
       </div>
 
       {showTerms && (

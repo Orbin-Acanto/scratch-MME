@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
               <img
                 src="/logo/logo.png"
                 alt="MME worldwide"
-                className="h-16 w-auto"
+                className="h-18 w-auto"
               />
             </a>
           </div>
