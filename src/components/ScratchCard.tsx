@@ -307,14 +307,14 @@ const ScratchCard: React.FC = () => {
             </button>
           </div>
           <motion.a
-            href="https://www.48wallnyc.com/"
+            href="https://www.mmeink.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative mt-8 inline-flex items-center justify-center gap-2 border border-primary/30 bg-primary/5 px-8 py-3 text-sm font-medium text-primary backdrop-blur-sm transition-all duration-300 hover:border-primary hover:bg-primary/10 sm:px-10 sm:py-4 sm:text-base"
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            Visit the MME worldwide Website
+            Visit the MME Worldwide Website
             <svg
               className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 sm:h-5 sm:w-5"
               fill="none"
