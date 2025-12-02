@@ -281,7 +281,7 @@ const ScratchCard: React.FC = () => {
             : "opacity-0 translate-y-4 pointer-events-none"
         }`}
       >
-        <div className="max-w-md sm:max-w-lg md:max-w-xl mx-auto bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-lg">
+        <div className="max-w-md sm:max-w-lg md:max-w-xl mx-auto bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg p-6 shadow-lg">
           <p className="text-sm sm:text-base text-whitesmoke/90 text-center mb-4">
             Enjoy a $2,500 credit toward your next event or celebration. This
             amount will be deducted from any package valued at $10,000 or more,
