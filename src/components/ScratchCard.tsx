@@ -359,9 +359,9 @@ const ScratchCard: React.FC = () => {
                 </h3>
                 <p>
                   This promotion is open to individuals 18 years or older.
-                  Employees of 48 Wall Street Events Inc, its affiliates,
-                  partners, and their immediate family members are not eligible
-                  to participate. The contest is valid only in the state of New
+                  Employees of MME Worldwide, its affiliates, partners, and
+                  their immediate family members are not eligible to
+                  participate. The contest is valid only in the state of New
                   York.
                 </p>
               </div>
@@ -394,7 +394,7 @@ const ScratchCard: React.FC = () => {
                 </h3>
                 <p className="mb-2 font-medium">Prizes are:</p>
                 <ol className="list-decimal list-inside space-y-1 ml-4 mb-3">
-                  <li>alid only for new bookings only.</li>
+                  <li>Valid for new bookings only.</li>
                   <li>
                     Redeemable for events taking place between January 1, 2026
                     and April 1, 2026.
