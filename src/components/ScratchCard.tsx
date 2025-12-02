@@ -9,7 +9,7 @@ import { triggerHolidayConfetti } from "../utils/confetti";
 import { motion } from "framer-motion";
 
 const SCRATCH_RADIUS = 24;
-const COMPLETE_THRESHOLD = 0.55;
+const COMPLETE_THRESHOLD = 0.85;
 const GOLD_COVER_SRC = "/prize/scratch-card-after-effets-label-gold.png";
 
 const ENABLE_PERSISTENCE = true;
