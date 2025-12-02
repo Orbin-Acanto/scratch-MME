@@ -290,8 +290,8 @@ const ScratchCard: React.FC = () => {
           </p>
           <div className="bg-white/5 rounded-md p-4 border border-white/10 mb-4">
             <p className="text-xs sm:text-sm text-whitesmoke/80 text-center">
-              This offer is valid for events taking place between January 1,
-              2026 and April 1, 2026.
+              This offer is valid for new bookings taking place between January
+              1, 2026 and April 1, 2026.
             </p>
           </div>
           <p className="text-base sm:text-lg font-semibold text-primary text-center">
@@ -371,11 +371,8 @@ const ScratchCard: React.FC = () => {
                   2. How to Enter
                 </h3>
                 <p>
-                  Participants must access the contest webpage through the link
-                  provided in the email marketing campaign. Each participant is
-                  permitted to play the virtual scratch-off one (1) time only.
-                  Multiple entries or attempts to bypass the system may result
-                  in disqualification.
+                  Participants must access the contest webpage through the QR
+                  code provided in the holiday card.
                 </p>
               </div>
 
@@ -384,11 +381,9 @@ const ScratchCard: React.FC = () => {
                   3. Contest Period
                 </h3>
                 <p>
-                  The contest is valid from{" "}
-                  <span className="font-medium">
-                    November 17, 2025 through November 21, 2025
-                  </span>
-                  . Entries submitted outside the contest period will not be
+                  The contest is valid until{" "}
+                  <span className="font-medium">December 31st, 2025</span>.
+                  Entries submitted outside the contest period will not be
                   honored.
                 </p>
               </div>
@@ -397,34 +392,19 @@ const ScratchCard: React.FC = () => {
                 <h3 className="font-semibold text-neutral-900 mb-2">
                   4. Prizes
                 </h3>
-                <p className="mb-3">
-                  Each virtual scratch-off reveals one (1) of four prizes,
-                  awarded at random:
-                </p>
-                <ol className="list-decimal list-inside space-y-1 ml-4 mb-3">
-                  <li>Hot Cocoa Cart</li>
-                  <li>Free Uplighting</li>
-                  <li>
-                    "Holy Cannoli Experience" (live cannoli maker at event)
-                  </li>
-                  <li>10% Off an Event Booking</li>
-                </ol>
                 <p className="mb-2 font-medium">Prizes are:</p>
-                <ul className="list-disc list-inside space-y-1 ml-4">
+                <ol className="list-decimal list-inside space-y-1 ml-4 mb-3">
+                  <li>alid only for new bookings only.</li>
                   <li>
-                    Valid only for new bookings at 48 Wall St, New York, NY
-                    10005
+                    Redeemable for events taking place between January 1, 2026
+                    and April 1, 2026.
                   </li>
-                  <li>
-                    Redeemable for events taking place January 2026 through
-                    March 2026
-                  </li>
-                  <li>Not transferable and not redeemable for cash</li>
+                  <li>Not transferable and not redeemable for cash.</li>
                   <li>
                     Subject to date availability and standard venue booking
-                    policies
+                    policies.
                   </li>
-                </ul>
+                </ol>
               </div>
 
               <div>
@@ -432,8 +412,8 @@ const ScratchCard: React.FC = () => {
                   5. Winner Verification & Redemption
                 </h3>
                 <p>
-                  To redeem a prize, winners must mention the promo code when
-                  booking their event at 48 Wall Street. The venue may request
+                  To redeem a prize, winners must mention the promotion when
+                  booking their event services. MME Worldwide may request
                   verification of identity or eligibility before applying the
                   prize to a booking.
                 </p>
@@ -444,14 +424,15 @@ const ScratchCard: React.FC = () => {
                   6. Limitations
                 </h3>
                 <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>One (1) prize per person.</li>
+                  <li>One (1) prize per person or organization.</li>
                   <li>
                     Prizes cannot be combined with any other discounts,
                     promotions, or offers unless explicitly stated.
                   </li>
                   <li>
-                    The venue reserves the right to refuse prize redemption for
-                    any booking that does not meet its standard requirements.
+                    MME Worldwide reserves the right to refuse prize redemption
+                    for any booking that does not meet its standard
+                    requirements.
                   </li>
                 </ul>
               </div>
@@ -461,8 +442,8 @@ const ScratchCard: React.FC = () => {
                   7. Liability
                 </h3>
                 <p>
-                  48 Wall Street Events Inc is not responsible for technical
-                  issues, lost entries, or interruptions that prevent
+                  MME Worldwide and its affiliates are not responsible for
+                  technical issues, lost entries, or interruptions that prevent
                   participation. By entering, participants agree to release the
                   venue from any claims related to the contest or prize use.
                 </p>
@@ -484,9 +465,8 @@ const ScratchCard: React.FC = () => {
                   9. Right to Modify or Cancel
                 </h3>
                 <p>
-                  48 Wall Street Events Inc reserves the right to amend,
-                  suspend, or cancel the promotion if circumstances outside its
-                  control arise.
+                  MME Worldwide reserves the right to amend, suspend, or cancel
+                  the promotion if circumstances outside its control arise.
                 </p>
               </div>
 
