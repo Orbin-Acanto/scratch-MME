@@ -10,7 +10,7 @@ const App: React.FC = () => {
       <div className="relative mt-[87px] min-h-[calc(100vh-87px)] overflow-hidden text-neutral-900">
         <div className="absolute inset-0 -z-10">
           <img
-            src="/BACKGROUND.png"
+            src="/BACKGROUND.jpg"
             alt="Holiday background"
             className="absolute inset-0 h-full w-full object-cover"
           />
