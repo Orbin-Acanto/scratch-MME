@@ -8,7 +8,7 @@ export type PrizeCard = {
 export const PRIZE_CARDS: PrizeCard[] = [
   {
     id: "P1",
-    image: "/prize/MME GOLDEN TICKET.png",
+    image: "/prize/MME GOLDEN TICKET.webp",
     promo: "2500 usd gift",
     alt: "2500 usd gift",
   },
