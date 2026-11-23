@@ -11,13 +11,14 @@ const App: React.FC = () => {
         <div className="absolute inset-0 -z-10">
           <img
             src="/BACKGROUND.jpg"
-            alt="Holiday background"
+            alt=""
+            fetchPriority="high"
             className="absolute inset-0 h-full w-full object-cover"
           />
 
           <img
             src="/SNOW FLAKES.png"
-            alt="Snow flakes"
+            alt=""
             className="absolute left-0 top-0 w-full h-auto"
           />
         </div>

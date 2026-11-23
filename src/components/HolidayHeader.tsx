@@ -3,7 +3,7 @@ import React from "react";
 const HolidayHeader: React.FC = () => {
   return (
     <header className="mb-10 mt-8 sm:mt-14 md:mt-18 lg:mt-30 xl:mt-30 2xl:mt-52 4xl:mt-62 animate-fade-in-up">
-      <p
+      <h1
         className="
           font-primary text-center text-whitesmoke 
           text-2xl sm:text-2xl md:text-3xl lg:text-4xl 
@@ -12,7 +12,7 @@ const HolidayHeader: React.FC = () => {
         "
       >
         Scratch Now And Reveal Your Prize
-      </p>
+      </h1>
     </header>
   );
 };

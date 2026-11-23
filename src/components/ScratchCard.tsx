@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 
 const SCRATCH_RADIUS = 24;
 const COMPLETE_THRESHOLD = 0.85;
-const GOLD_COVER_SRC = "/prize/scratch-card-after-effets-label-gold.png";
+const GOLD_COVER_SRC = "/prize/scratch-card-after-effets-label-gold.webp";
 
 const ENABLE_PERSISTENCE = true;
 
@@ -242,6 +242,8 @@ const ScratchCard: React.FC = () => {
             <img
               src={card.image}
               alt={card.alt}
+              width={578}
+              height={434}
               className="w-full h-auto block"
               onLoad={() => setCardLoaded(true)}
             />
